@@ -285,7 +285,7 @@ PrintHexByte        proc
 ; Destr:   si, di, al
 ;-----------------------------------------------------------------
 WriteHorLine proc
-		 	 
+
 			 cld
 			 
 			 push cx	   ; save d_x
@@ -316,7 +316,7 @@ WriteHorLine proc
 ; Destr:    di, bx, al, si
 ;-----------------------------------------------------------------
 DrawFrame       proc
-                
+
                 mov si, offset border
                 mov ah, FRAME_COLOR
 
