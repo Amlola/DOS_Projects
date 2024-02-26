@@ -32,7 +32,7 @@ VMEM     equ 0b800h
 
 
 .PUSH_ALL_REGISTERS macro
-		    nop
+            nop
 
                     push sp bp ss es ds di si dx cx bx ax
 
@@ -43,8 +43,8 @@ VMEM     equ 0b800h
 
                     mov ax, [bp + (REG_NUMBER - 2) * 2]            ; push ip
                     push ax
-			
-		    nop
+            
+            nop
                     endm
 
 .POP_ALL_REGISTERS  macro
@@ -58,14 +58,14 @@ FRAME_WIDTH   equ 11d
 FRAME_HEIGHT  equ 15d
 COORD_X0      equ 68d    
 COORD_Y0      equ 2d          ; start coord for panelka
-DELTA_X       equ 1d    		
+DELTA_X       equ 1d            
 DELTA_Y       equ 1d          ; delta for shadow
 
 SHADOW_COLOR  equ 30h         ; blue
 FRAME_COLOR   equ 4eh
 REG_COLOR     equ 4eh
 
-SPACE	      equ 20h
+SPACE          equ 20h
 
 REG_NUMBER    equ 13d
 TITLE_LEN     equ 9d
@@ -123,8 +123,8 @@ main:
 ; Destroys:  Nothing
 ;-----------------------------------------------------------------
 NewIntKeybrd    proc
-		
-		push ax
+        
+        push ax
 
                 in al, 60h                          ; port 60h - contains last scan code
                 cmp al, R_SHIFT_PRESSING            ; right_shift_press
@@ -279,39 +279,39 @@ PrintHexByte        proc
 ;-----------------------------------------------------------------
 ; writes a line to Vmem
 ; Entry:   cx = delta_x
-;		   di - current cell Vmem
+;           di - current cell Vmem
 ;          ah - color attribute
-;		   si = current &frame
+;           si = current &frame
 ; Destr:   si, di, al
 ;-----------------------------------------------------------------
 WriteHorLine proc
 
-			 cld
-			 
-			 push cx	   ; save d_x
+             cld
+             
+             push cx       ; save d_x
 
-			 sub cx, 2     ; !rep
+             sub cx, 2     ; !rep
 
-			 lodsb		   ; first
-			 stosw		  
+             lodsb         ; first
+             stosw          
 
-			 lodsb		   ; middle
-			 rep stosw	   
-			
-			 lodsb		   ; last
-			 stosw
+             lodsb         ; middle
+             rep stosw       
+            
+             lodsb         ; last
+             stosw
 
-			 pop cx
+             pop cx
 
-			 sub si, 3
+             sub si, 3
 
-			 ret
-			 endp
+             ret
+             endp
 
 ;-----------------------------------------------------------------
 ; Writes frame
-; Entry:	di - current cell Vmem
-;		    si = current &frame
+; Entry:    di - current cell Vmem
+;            si = current &frame
 ;
 ; Destr:    di, bx, al, si
 ;-----------------------------------------------------------------
@@ -325,30 +325,30 @@ DrawFrame       proc
 
                 mov di, (COORD_Y0 * SCREEN_WIDTH + COORD_X0) * 2
 
-				call DrawFirstLine
+                call DrawFirstLine
 
-				draw:
-					call WriteHorLine
+                draw:
+                    call WriteHorLine
 
-					call DrawRightShadow
+                    call DrawRightShadow
 
-					call VmemShift
+                    call VmemShift
 
-					dec bx
+                    dec bx
 
-					cmp bx, 1
-					jne draw
+                    cmp bx, 1
+                    jne draw
 
-				call DrawLastLine
+                call DrawLastLine
 
-				call DrawShadowUnderPanelka
+                call DrawShadowUnderPanelka
 
                 call DrawTitle
 
                 call DrawRegisterNames
-					
-				ret
-				endp
+                    
+                ret
+                endp
 
 ;-----------------------------------------------------------------
 ; Writes reg names
@@ -401,109 +401,109 @@ DrawTitle       proc
 
 ;-----------------------------------------------------------------
 ;Writes frame
-;Entry:	 di - current cell Vmem
-;		 cx = delta_x
+;Entry:     di - current cell Vmem
+;         cx = delta_x
 ;Destr:  di
 ;Return: di = &new_line
 ;-----------------------------------------------------------------
 VmemShift       proc
 
-				push ax
+                push ax
           
-				mov ax, SCREEN_WIDTH    ; to new line
-				sub ax, cx				; shift left
-				shl ax, 1				; fix
-	
-				add di, ax
+                mov ax, SCREEN_WIDTH    ; to new line
+                sub ax, cx                ; shift left
+                shl ax, 1                ; fix
+    
+                add di, ax
 
-				pop ax
+                pop ax
 
-				ret
-				endp
+                ret
+                endp
 
             
 ;-----------------------------------------------------------------
 ;Entry: cx = delta_x
-;		bx = delta_y
-;		si - current &frame
+;        bx = delta_y
+;        si - current &frame
 ;
 ;Destr: si, bx, di
 ;-----------------------------------------------------------------
-DrawFirstLine	proc
+DrawFirstLine    proc
 
-				call WriteHorLine
-				call VmemShift
-				dec bx
-				add si, 3
+                call WriteHorLine
+                call VmemShift
+                dec bx
+                add si, 3
 
-				ret
-				endp
+                ret
+                endp
 
 ;-----------------------------------------------------------------
 ;Entry: cx = d_x
-;		bx = d_y
-;		si = current &frame
+;        bx = d_y
+;        si = current &frame
 ;
 ;Destr: si, bx, di
 ;-----------------------------------------------------------------
-DrawLastLine	proc
+DrawLastLine    proc
 
-				add si, 3
-				call WriteHorLine
-				call DrawRightShadow
-				call VmemShift
+                add si, 3
+                call WriteHorLine
+                call DrawRightShadow
+                call VmemShift
 
-				ret
-				endp
+                ret
+                endp
 
 
 ;-----------------------------------------------------------------
 ;Entry: di - current cell Vmem
-;	  	ah - color attr
-;	  	al - symbol
+;          ah - color attr
+;          al - symbol
 ;
 ;Destr: di, ah, al
 ;-----------------------------------------------------------------
-DrawRightShadow		proc
+DrawRightShadow        proc
 
-					push cx	ax
+                    push cx    ax
 
-					mov cx, DELTA_X
-					mov ah, SHADOW_COLOR
-					mov al, SPACE
+                    mov cx, DELTA_X
+                    mov ah, SHADOW_COLOR
+                    mov al, SPACE
 
-					rep	stosw
+                    rep    stosw
 
-					sub di, DELTA_X * 2
+                    sub di, DELTA_X * 2
 
-					pop ax cx
+                    pop ax cx
 
-					ret
-					endp
+                    ret
+                    endp
 
 ;-----------------------------------------------------------------
 ;Entry: di - current cell Vmem
-;	  	al - symbol
+;          al - symbol
 ;
 ;Destr: di, ah, al
 ;-----------------------------------------------------------------
 DrawShadowUnderPanelka  proc
-						
-						push ax cx
+                        
+                        push ax cx
 
-						mov ah, SHADOW_COLOR
-						mov al, SPACE
+                        mov ah, SHADOW_COLOR
+                        mov al, SPACE
 
-						add di, DELTA_X * 2
+                        add di, DELTA_X * 2
 
-						rep	stosw
+                        rep    stosw
 
-						sub di, DELTA_X * 2
+                        sub di, DELTA_X * 2
 
-						pop cx ax
-					
-						ret
-						endp
+                        pop cx ax
+                    
+                        ret
+                        endp
 
 .data
 
