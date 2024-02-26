@@ -5,7 +5,6 @@ org 100h
 locals @@
 
 
-
 VMEM     equ 0b800h  
 
 
@@ -62,7 +61,7 @@ COORD_Y0      equ 2d          ; start coord for panelka
 DELTA_X       equ 1d    		
 DELTA_Y       equ 1d          ; delta for shadow
 
-SHADOW_COLOR  equ 30h             ; blue
+SHADOW_COLOR  equ 30h         ; blue
 FRAME_COLOR   equ 4eh
 REG_COLOR     equ 4eh
 
@@ -124,8 +123,8 @@ main:
 ; Destroys:  Nothing
 ;-----------------------------------------------------------------
 NewIntKeybrd    proc
-
-                .PUSH_ALL_REGISTERS                 ; save all registers
+		
+		push ax
 
                 in al, 60h                          ; port 60h - contains last scan code
                 cmp al, R_SHIFT_PRESSING            ; right_shift_press
@@ -145,11 +144,11 @@ NewIntKeybrd    proc
 
                 .EOI
 
-                .POP_ALL_REGISTERS
+                pop ax
                 iret                                ; IP, CS, EFLAGS
 
                 @@default_int:
-                    .POP_ALL_REGISTERS
+                    pop ax
                     db 0EAh                         ; far jmp, call default interrupt
                     old_keybrd_int_offset  dw 0
                     old_keybrd_int_segment dw 0
