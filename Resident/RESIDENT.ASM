@@ -32,7 +32,7 @@ VMEM     equ 0b800h
 
 
 .PUSH_ALL_REGISTERS macro
-            nop
+                    nop
 
                     push sp bp ss es ds di si dx cx bx ax
 
@@ -44,7 +44,7 @@ VMEM     equ 0b800h
                     mov ax, [bp + (REG_NUMBER - 2) * 2]            ; push ip
                     push ax
             
-            nop
+                    nop
                     endm
 
 .POP_ALL_REGISTERS  macro
@@ -65,7 +65,7 @@ SHADOW_COLOR  equ 30h         ; blue
 FRAME_COLOR   equ 4eh
 REG_COLOR     equ 4eh
 
-SPACE          equ 20h
+SPACE         equ 20h
 
 REG_NUMBER    equ 13d
 TITLE_LEN     equ 9d
@@ -79,7 +79,6 @@ START_REG_VALUE_OFFSET equ 73d
 
 Start:
                 jmp main
-
 
 main:
 ;-----------------get_old_keybrd_interrupt_vector-----------------
@@ -124,7 +123,7 @@ main:
 ;-----------------------------------------------------------------
 NewIntKeybrd    proc
         
-        push ax
+                push ax
 
                 in al, 60h                          ; port 60h - contains last scan code
                 cmp al, R_SHIFT_PRESSING            ; right_shift_press
@@ -233,18 +232,18 @@ WriteRegistrValue   proc
 ; Return:   nothing
 ; Destroys: ah - color attr, dh, dl
 ;-----------------------------------------------------------------
-PrintHexWord      proc
+PrintHexWord    proc
 
-                    mov ah, REG_COLOR
+                mov ah, REG_COLOR
 
-                    xchg dl, dh
-                    call PrintHexByte                 ; hi byte
+                xchg dl, dh
+                call PrintHexByte                 ; hi byte
 
-                    xchg dl, dh
-                    call PrintHexByte                 ; low byte
+                xchg dl, dh
+                call PrintHexByte                 ; low byte
 
-                    ret
-                    endp
+                ret
+                endp
 
 ;-----------------------------------------------------------------
 ; print hex byte reg
@@ -429,7 +428,7 @@ VmemShift       proc
 ;
 ;Destr: si, bx, di
 ;-----------------------------------------------------------------
-DrawFirstLine    proc
+DrawFirstLine   proc
 
                 call WriteHorLine
                 call VmemShift
@@ -464,15 +463,15 @@ DrawLastLine    proc
 ;
 ;Destr: di, ah, al
 ;-----------------------------------------------------------------
-DrawRightShadow        proc
+DrawRightShadow     proc
 
-                    push cx    ax
+                    push cx ax
 
                     mov cx, DELTA_X
                     mov ah, SHADOW_COLOR
                     mov al, SPACE
 
-                    rep    stosw
+                    rep stosw
 
                     sub di, DELTA_X * 2
 

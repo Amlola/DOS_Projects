@@ -9,7 +9,7 @@ Start:
         pop cx
 
         call PrintHexWord
-  
+
         mov ax, 1111h
         mov bx, 2222h
         mov cx, 3333h
@@ -33,10 +33,10 @@ PrintHexWord    proc
                 mov ah, 2
 
                 xchg cl, ch
-                call PrintHexByte                 ; hi byte
+                call PrintHexByte                                 ; hi byte
 
                 xchg cl, ch
-                call PrintHexByte                 ; low byte
+                call PrintHexByte                                 ; low byte
 
                 ret
                 endp
