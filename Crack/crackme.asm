@@ -20,6 +20,13 @@ main:
 
         call GetPassword
 
+        push dx
+
+        mov dx, offset to_next_line
+        call PrintMessage
+
+        pop dx
+
         call CheckPassword
         call PrintMessage
 
@@ -71,10 +78,16 @@ HashFunc        proc
                     inc bx
                     loop @@cycle_hash
 
-                pop dx
+                cmp received_hash, 0000h            ; specifically so that it can be hacked through a hash
+                jne @@return
 
-                ret
-                endp
+                mov received_hash, ax
+                mov cl, 1
+
+                @@return:
+                    pop dx
+                    ret
+                    endp
 
 ;---------------------------------------------------------------------
 ; Check Password Function
@@ -90,15 +103,14 @@ CheckPassword   proc
 
                 call CheckHash
 
-                cmp ax, 1
-                jne wrong_password
+                cmp check_password, 0
+                jne right_password
 
-                mov dx, offset success_message
+                mov dx, offset denied_message
                 jmp @@return
 
-                wrong_password:
-                    mov check_password, 1
-                    mov dx, offset denied_message
+                right_password:
+                    mov dx, offset success_message
 
                 @@return:
                     ret
@@ -109,8 +121,6 @@ CheckPassword   proc
 ; Entry:  ax - right hash value
 ;
 ; Destr:  bx - temporary storage ax, ax
-;
-; Return: ax - result right hash or no  
 ;---------------------------------------------------------------------         
 CheckHash       proc
 
@@ -120,14 +130,16 @@ CheckHash       proc
 
                 pop bx
 
-                cmp ax, bx
-                jne wrong_hash
+                cmp cl, 1
+                je comparation
 
-                mov ax, 1
-                jmp @@return
+                xchg bl, bh
 
-                wrong_hash:
-                    xor ax, ax
+                comparation:
+                    cmp received_hash, bx
+                    jne @@return
+
+                mov check_password, 1                   ; if hash1 == hash2, flag = 1
 
                 @@return:
                     ret
@@ -150,20 +162,22 @@ PrintMessage    proc
                 endp
 
 .data
-    password_buffer: db 254  
-        
+    password_buffer: 
+                     db 254
+                     db 14 dup(0)           
+
+    received_hash    dw 0000h
+
+    enter_message    db "Enter Password: $"
+
     check_password   db 0
 
-    enter_message    db 0dh, 0ah, "Enter Password: $"
+    denied_message   db "Password is incorrect$"
 
-    success_message  db 0dh, 0ah, "Password correct$"
+    success_message  db "Password correct$"
 
-    denied_message   db 0dh, 0ah, "Password is incorrect$"
+    to_next_line     db 0dh, 0ah, "$"
 
-    ;   maybe canary
-
-    right_hash_value dw 0ed2h
-
-    ;   maybe canary
+    right_hash_value dw 0e48h               ; notaH
 
 end Start   
